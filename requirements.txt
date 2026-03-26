@@ -1,0 +1,13 @@
+pandas
+numpy
+scikit-learn
+xgboost
+shap
+streamlit
+matplotlib
+seaborn
+plotly
+mysql-connector-python
+jupyter
+openpyxl
+pillow
