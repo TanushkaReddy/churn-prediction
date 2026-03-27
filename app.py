@@ -197,12 +197,27 @@ if page == "Churn Predictor":
     predict = st.button("Generate Churn Risk Assessment")
 
     if predict:
-        input_data = pd.DataFrame([[
-            tenure, city_tier, warehouse_dist, hour_spend,
-            devices, satisfaction, num_address, complain,
-            order_hike, 2, order_count, days_last_order,
-            cashback, 1, 3, 1, 1, 10
-        ]], columns=features)
+        input_dict = {
+            'Tenure': tenure,
+            'PreferredLoginDevice': 1,
+            'CityTier': city_tier,
+            'WarehouseToHome': warehouse_dist,
+            'PreferredPaymentMode': 3,
+            'Gender': 1,
+            'HourSpendOnApp': hour_spend,
+            'NumberOfDeviceRegistered': devices,
+            'PreferedOrderCat': 2,
+            'SatisfactionScore': satisfaction,
+            'MaritalStatus': 1,
+            'NumberOfAddress': num_address,
+            'Complain': complain,
+            'OrderAmountHikeFromlastYear': order_hike,
+            'CouponUsed': 2,
+            'OrderCount': order_count,
+            'DaySinceLastOrder': days_last_order,
+            'CashbackAmount': cashback
+        }
+        input_data = pd.DataFrame([input_dict])[features]
 
         prob = model.predict_proba(input_data)[0][1]
         pred = model.predict(input_data)[0]
