@@ -232,7 +232,7 @@ if page == "Churn Predictor":
                   "Will Churn" if pred == 1 else "Will Stay")
         c4.metric("Confidence", f"{max(prob, 1-prob):.1%}")
 
-        # ✅ REPLACED: MySQL → Session State
+        # ✅ Session state logging
         if 'history' not in st.session_state:
             st.session_state.history = []
         st.session_state.history.append({
@@ -244,7 +244,7 @@ if page == "Churn Predictor":
             'prediction': "Churn" if pred==1 else "Stay"
         })
 
-    # ✅ REPLACED: Prediction History Section
+    # Prediction History
     st.markdown("---")
     st.markdown("### Prediction History")
 
@@ -254,61 +254,63 @@ if page == "Churn Predictor":
     else:
         st.info("No predictions yet — make one above!")
 
-    col1, col2 = st.columns([1, 1.5])
-    with col1:
-        color = "#ef4444" if prob > 0.6 else "#f59e0b" if prob > 0.3 else "#22c55e"
-        fig = go.Figure(go.Indicator(
-            mode="gauge+number",
-            value=round(prob * 100, 1),
-            number={'suffix': '%', 'font': {'size': 36, 'color': '#0f172a'}},
-            title={'text': "Churn Risk Score",
-                   'font': {'size': 16, 'color': '#64748b'}},
-            gauge={
-                'axis': {'range': [0, 100],
-                         'tickcolor': '#94a3b8'},
-                'bar':  {'color': color, 'thickness': 0.25},
-                'bgcolor': 'white',
-                'bordercolor': '#e2e8f0',
-                'steps': [
-                    {'range': [0,  30], 'color': '#f0fdf4'},
-                    {'range': [30, 60], 'color': '#fffbeb'},
-                    {'range': [60,100], 'color': '#fef2f2'}
-                ],
-                'threshold': {
-                    'line': {'color': color, 'width': 3},
-                    'thickness': 0.8,
-                    'value': prob * 100
+    # ✅ FIX: wrapped inside if predict
+    if predict:
+        col1, col2 = st.columns([1, 1.5])
+        with col1:
+            color = "#ef4444" if prob > 0.6 else "#f59e0b" if prob > 0.3 else "#22c55e"
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=round(prob * 100, 1),
+                number={'suffix': '%', 'font': {'size': 36, 'color': '#0f172a'}},
+                title={'text': "Churn Risk Score",
+                       'font': {'size': 16, 'color': '#64748b'}},
+                gauge={
+                    'axis': {'range': [0, 100],
+                             'tickcolor': '#94a3b8'},
+                    'bar':  {'color': color, 'thickness': 0.25},
+                    'bgcolor': 'white',
+                    'bordercolor': '#e2e8f0',
+                    'steps': [
+                        {'range': [0,  30], 'color': '#f0fdf4'},
+                        {'range': [30, 60], 'color': '#fffbeb'},
+                        {'range': [60,100], 'color': '#fef2f2'}
+                    ],
+                    'threshold': {
+                        'line': {'color': color, 'width': 3},
+                        'thickness': 0.8,
+                        'value': prob * 100
+                    }
                 }
-            }
-        ))
-        fig.update_layout(
-            paper_bgcolor='white',
-            height=280,
-            margin=dict(t=40, b=10, l=20, r=20)
-        )
-        st.plotly_chart(fig, use_container_width=True)
+            ))
+            fig.update_layout(
+                paper_bgcolor='white',
+                height=280,
+                margin=dict(t=40, b=10, l=20, r=20)
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
-    with col2:
-        st.markdown("### Recommended Actions")
-        if prob > 0.6:
-            st.markdown("""
-            <div class='badge-red'>Immediate intervention required</div>
-            <div class='badge-amber'>Offer a personalised discount or cashback reward</div>
-            <div class='badge-amber'>Assign a dedicated support agent if complaint exists</div>
-            <div class='badge-amber'>Send re-engagement campaign within 48 hours</div>
-            """, unsafe_allow_html=True)
-        elif prob > 0.3:
-            st.markdown("""
-            <div class='badge-amber'>Monitor this customer closely</div>
-            <div class='badge-green'>Send a loyalty reward to increase satisfaction</div>
-            <div class='badge-green'>Encourage app engagement with push notifications</div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div class='badge-green'>Customer is healthy — low churn risk</div>
-            <div class='badge-green'>Continue current engagement strategy</div>
-            <div class='badge-green'>Consider upselling premium features</div>
-            """, unsafe_allow_html=True)
+        with col2:
+            st.markdown("### Recommended Actions")
+            if prob > 0.6:
+                st.markdown("""
+                <div class='badge-red'>Immediate intervention required</div>
+                <div class='badge-amber'>Offer a personalised discount or cashback reward</div>
+                <div class='badge-amber'>Assign a dedicated support agent if complaint exists</div>
+                <div class='badge-amber'>Send re-engagement campaign within 48 hours</div>
+                """, unsafe_allow_html=True)
+            elif prob > 0.3:
+                st.markdown("""
+                <div class='badge-amber'>Monitor this customer closely</div>
+                <div class='badge-green'>Send a loyalty reward to increase satisfaction</div>
+                <div class='badge-green'>Encourage app engagement with push notifications</div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class='badge-green'>Customer is healthy — low churn risk</div>
+                <div class='badge-green'>Continue current engagement strategy</div>
+                <div class='badge-green'>Consider upselling premium features</div>
+                """, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════════════════════
 # PAGE 2 — OVERVIEW
